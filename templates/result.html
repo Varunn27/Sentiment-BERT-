@@ -1,0 +1,83 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Sentiment Analysis Result</title>  
+    <link rel="stylesheet" href="/static/css/result-style.css">  
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>  
+    <script src="/static/javascript/a.js"></script>
+    <script>  
+        document.addEventListener("DOMContentLoaded", function () {  
+            // If you need to display the final prediction after 3 seconds  
+            setTimeout(function () {  
+                var finalPredictionElement = document.getElementById('finalPrediction');  
+                finalPredictionElement.style.display = 'block';  
+            }, 3000);  
+        });  
+
+        // Declare a variable to hold the chart instance  
+        var sentimentPieChartInstance;  
+            
+        function showGraphs() {  
+            // Example data for the pie chart, replace this with your actual data  
+            var pieChartData = []; // This will be populated with actual data from percentagesObject  
+            
+            // Make a GET request to the server to get the percentages object
+            fetch('/get-percentages')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('data');
+                    console.log(data)
+                    // Use Object.entries to iterate over key-value pairs of the percentagesObject
+                    for (var [key, value] of Object.entries(data)) {
+                        // Push the value into pieChartData
+                        pieChartData.push(value);
+                    }
+                    // Initialize the graphs with the actual data  
+                    initializeGraphs(pieChartData);  
+                    // Make the graphs visible  
+                    document.getElementById('graphs').style.display = 'block';  
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }  
+    </script>  
+</head>  
+<body>  
+    <h1>Sentiment Analysis Result</h1>  
+    <div id="percentages">  
+        <ul>  
+            {% for key, value in Percentages.items() %}  
+            <li>  
+                {% if key|upper == 'POSITIVE' %}  
+                    <img src="{{ url_for('static', filename='images/happy.jpeg') }}" alt="Happy" style="width: 24px; height: 24px; vertical-align: middle;">  
+                {% elif key|upper == 'NEUTRAL' %}  
+                    <img src="{{ url_for('static', filename='images/neutral.jpeg') }}" alt="Neutral" style="width: 24px; height: 24px; vertical-align: middle;">  
+                {% elif key|upper == 'NEGATIVE' %}  
+                    <img src="{{ url_for('static', filename='images/sad.png') }}" alt="Sad" style="width: 24px; height: 24px; vertical-align: middle;">  
+                {% endif %}  
+                {{ key|upper }}: {{ value }}%  
+            </li>  
+            {% endfor %}  
+        </ul>  
+    </div>  
+    <p id="finalPrediction" style="display:none;">Final Prediction: {{ FinalPrediction.upper() }}</p>    
+    {% if FinalPrediction.upper() == 'POSITIVE' %}    
+        <img src="{{ url_for('static', filename='images/happy.jpeg') }}" alt="Happy" style="width: 100px; height: 100px;">    
+    {% elif FinalPrediction.upper() == 'NEUTRAL' %}    
+        <img src="{{ url_for('static', filename='images/neutral.jpeg') }}" alt="Neutral" style="width: 100px; height: 100px;">    
+    {% elif FinalPrediction.upper() == 'NEGATIVE' %}    
+        <img src="{{ url_for('static', filename='images/sad.png') }}" alt="Sad" style="width: 100px; height: 100px;">    
+    {% endif %}  
+    <!--     
+    <button id="showGraphBtn" onclick="showGraphs()">Show Graphs</button>  
+    <div id="graphs" style="display:none;">  
+        <div id="sentimentPieChart"></div> 
+    Make sure this element is a div, not a canvas -->  
+    <!-- </div>  
+    -->
+    <a href="/">Try again</a>  
+</body>
+</html>

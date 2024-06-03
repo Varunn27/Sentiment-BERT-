@@ -1,0 +1,4 @@
+transformers==4.40.2
+torch==2.3.0
+textblob==0.18.0
+flask==3.0.3
